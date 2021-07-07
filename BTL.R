@@ -2,52 +2,90 @@ library(dplyr)
 
 data <- read.csv('C:/Users/Admin/Desktop/XSTK/gia_nha.csv', TRUE, ",")
 
+#2 -
+## a---------
 new_DF <- data.frame(data$price, data$sqft_living15, data$floors,
                      data$condition, data$sqft_above, data$sqft_living)
 
 colnames(new_DF) <- c("price", "sqft_living15", "floors", "condition", "sqft_above", "sqft_living")
 
-#D???m các giá tr??? b??? Missing
+## b---------
+#Dem cac gia tri Missing
 colSums(is.na(new_DF))
-which(is.na(new_DF$price)) #V??? trí c???a các Missing value
+which(is.na(new_DF$price)) #Vi tri cua cac Missing value
 
-#Vì s??? li???u b??? Missing r???t bé so v???i t???ng d??? li???u nên d??? li???u missing là b???ng 0
-#ho???c b??? lo???i b???
+#Vi du lieu bi Missing rat be so voi tong du lieu nen ta co the set du lieu
+#ve 0 hoac loai bo du lieu
 
 new_DF <- new_DF %>% filter(!is.na(new_DF))
 
-#Chuy???n d??? li???u c???n tính v??? d???ng log
+
+#3
+## a-------------------
+#Chuyen du lieu can tinh ve dang log
 new_DF$price <- log(new_DF$price)
 new_DF$sqft_living15 <- log(new_DF$sqft_living15)
 new_DF$sqft_above <- log(new_DF$sqft_above)
 new_DF$sqft_living <- log(new_DF$sqft_living)
 
-#Trung bình
+## b------------------
+#Trung binh
 mean = apply(new_DF[,c("price", "sqft_living15", "sqft_above", "sqft_living")], 2, mean)
 
-#Trung v???
+#Trung vi
 median = apply(new_DF[,c("price", "sqft_living15", "sqft_above", "sqft_living")], 2, median)
 
-#D??? l???ch chu???n
+#Do lech chuan
 sd = apply(new_DF[,c("price", "sqft_living15", "sqft_above", "sqft_living")], 2, sd)
 
-#Giá tr??? l???n nh???t
+#Gia tri lon nhat
 max = apply(new_DF[,c("price", "sqft_living15", "sqft_above", "sqft_living")], 2, max)
 
-#Giá tr??? nh??? nh???t
+#Gia tri nho nhat
 min = apply(new_DF[,c("price", "sqft_living15", "sqft_above", "sqft_living")], 2, min)
 
-#Xu???t k???t qu??? du???i d???ng b???ng
+#Xuat ket qua duoi dang bang
 analyze <- data.frame(mean, median, sd, max, min)
 analyze
 
-#B???ng th???ng kê s??? lu???ng
+## c-----------------
+#Bang thong ke so luong
 floor <- table(new_DF$floors)
 floor
 
 condition <- table(new_DF$condition)
 condition
 
-#D??? th??? phân ph???i bi???n price
+## d-----------------
+#Do thi phan phoi bien price
 hist(new_DF$price, main = "HISTOGRAM OF PRICE", xlab="Price", ylim = c(0,8000))
 
+## e-----------------
+#Phan phoi cua bien price cho tung nhom phan loai
+boxplot(new_DF$price ~ new_DF$floors, 
+        main = "Do thi phan phoi cua bien Price theo bien Floor",
+        xlab = "Floor",
+        ylab = "Price",
+        col = "cadetblue2",
+        border = "cornflowerblue")
+
+boxplot(new_DF$price ~ new_DF$condition, 
+        main = "Do thi phan phoi cua bien Price theo bien Condition",
+        xlab = "Condition",
+        ylab = "Price",
+        col = "cadetblue2",
+        border = "cornflowerblue")
+
+## f-----------------
+#Phan phoi cua bien price lan luot theo cac bien
+pairs(new_DF$price ~ new_DF$sqft_living15,
+      main = "Phan phoi cua bien Price theo bien Sqft_living15",
+      labels = c("Price", "Sqft_living15"))
+
+pairs(new_DF$price ~ new_DF$sqft_above,
+      main = "Phan phoi cua bien Price theo bien Sqft_above",
+      labels = c("Price", "Sqft_above"))  
+
+pairs(new_DF$price ~ new_DF$sqft_living,
+      main = "Phan phoi cua bien Price theo bien Sqft_living",
+      labels = c("Price", "Sqft_living"))  
