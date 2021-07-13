@@ -1,5 +1,6 @@
 library(dplyr)
-
+library(nortest)
+library(car)
 # 1-
 ## a----------
 load("C:/Users/Admin/Desktop/XSTK/flights.rda")
@@ -62,15 +63,23 @@ boxplot(new_box_data$dep_delay ~ new_box_data$carrier,
         border = "cornflowerblue")
 
 #2--
+pdx <- subset(newFlights, newFlights$origin=="PDX") #Loc chuyen bay den tu Portland
 ##a
 ##b
 ## c----------
+#Do thi QQ-plot
+anova_ow <- aov(dep_delay ~ carrier, data = pdx)
+plot(anova_ow, 2)
 
+
+#Kiem dinh Anderson-Darling
+anova_res <- residuals(object = anova_ow)
+ad.test(anova_res) 
+
+#Kiem dinh Levene
+suppressWarnings( leveneTest(dep_delay ~ carrier, data = pdx) )
 
 ## d----------
-#Loc cac hang hang khong xuat phat tu Portland
-pdx <- subset(newFlights, newFlights$origin=="PDX")
 #phan tich anova
-one.way <- aov(dep_delay ~ carrier, data = pdx)
-summary(one.way)
+summary(anova_ow)
 

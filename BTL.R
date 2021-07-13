@@ -50,10 +50,10 @@ analyze
 
 ## c-----------------
 #Bang thong ke so luong
-floor <- table(new_DF$floors)
+floor <- table(floors = new_DF$floors)
 floor
 
-condition <- table(new_DF$condition)
+condition <- table(condition = new_DF$condition)
 condition
 
 ## d-----------------
@@ -88,4 +88,39 @@ pairs(new_DF$price ~ new_DF$sqft_above,
 
 pairs(new_DF$price ~ new_DF$sqft_living,
       main = "Phan phoi cua bien Price theo bien Sqft_living",
-      labels = c("Price", "Sqft_living"))  
+      labels = c("Price", "Sqft_living")) 
+
+#4--
+## a-------------
+# Thuc thi mo hinh hoi quy tuyen tinh boi
+M1 <- lm(price ~ sqft_living15 + floors + condition + sqft_above +sqft_living,
+         data = new_DF)
+
+## b-------------
+summary(M1)
+
+## c-------------
+M2 <- lm(price ~ sqft_living15 + floors + sqft_above +sqft_living,
+         data = new_DF)
+anova(M2, M1)
+
+## d-------------
+M1
+
+## e-------------
+plot(M1, 1)
+
+#5--
+##a--------------
+
+x1 <- apply(new_DF[,c("sqft_living15","sqft_above", "sqft_living")], 2, mean)
+x2 <- apply(new_DF[,c("sqft_living15","sqft_above", "sqft_living")], 2, max)
+predData <- as.data.frame(rbind(x1,x2))
+preData$floors = 2
+preData$condition = 3
+
+price <- predict(M1, newdata = preData, interval = "confidence")
+price <- as.data.frame(price)
+rownames(price) <- c("x1", "x2")
+
+price$Confidence_Intervals = price$upr - price$lwr
